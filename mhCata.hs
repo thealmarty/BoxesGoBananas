@@ -13,7 +13,7 @@ data ExpF a -- terms are either lam expressions or function applications
   = Lam (a -> a)
   | App a a
 
-type Exp = Rec ExpF --
+type Exp = Rec ExpF
 
 lam :: (Exp -> Exp) -> Exp -- lambda expression
 lam x = Roll (Lam x)
@@ -45,3 +45,10 @@ unevalAux (Fn f) = Lam f
 
 eval :: Exp -> Value
 eval = cata evalAux unevalAux
+
+-- Example expressions
+identity :: Exp
+identity = lam id
+
+idAppid :: Exp
+idAppid = app identity identity
