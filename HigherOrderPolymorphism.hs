@@ -7,6 +7,8 @@
 {-# LANGUAGE TypeSynonymInstances   #-}
 {-# LANGUAGE UndecidableInstances   #-}
 
+import           Expression
+
 -- Extending Fegaras and Sheard's catamorphism
 -- using higher order polymorphism
 newtype Value =
@@ -14,34 +16,11 @@ newtype Value =
 
 unFn (Fn x) = x
 
-data Rec a b
-  = Roll (a (Rec a b))
-  | Place b
-
-data ExpF a -- terms are either lam expressions or function applications
-  = Lam (a -> a)
-  | App a a
-
-type Exp a = Rec ExpF a
-
 lam :: (Exp a -> Exp a) -> Exp a -- lambda expression
-lam x = Roll (Lam x)
+lam x = roll (Lam x)
 
 app :: Exp a -> Exp a -> Exp a -- function applications
-app x y = Roll (App x y)
-
-xmapExpF :: (a -> b, b -> a) -> (ExpF a -> ExpF b, ExpF b -> ExpF a)
-xmapExpF (f, g) =
-  ( \case
-      Lam x -> Lam (f . x . g)
-      App y z -> App (f y) (f z)
-  , \case
-      Lam x -> Lam (g . x . f)
-      App y z -> App (g y) (g z))
-
-cata :: (ExpF a -> a) -> Exp a -> a -- catamorphism
-cata f (Roll x)  = f (fst (xmapExpF (cata f, Place)) x)
-cata f (Place x) = x
+app x y = roll (App x y)
 
 -- count the number of occurrences of bound variables in a sound expression
 -- i.e., no Place and do not contain any non-parametric function spaces
@@ -58,7 +37,7 @@ iter0 :: (ExpF b -> b) -> (forall a. Exp a) -> b
 iter0 = cata
 
 openiter1 :: (ExpF b -> b) -> (Exp b -> Exp b) -> (b -> b)
-openiter1 f x y = cata f (x (Place y))
+openiter1 f x y = cata f (x (place y))
 
 -- rule out all unsound expressions
 iter1 :: (ExpF b -> b) -> (forall a. Exp a -> Exp a) -> (b -> b)
@@ -79,7 +58,7 @@ class Iterable a m n | m -> a, m -> n where
 
 instance Iterable a (Exp a) a where
   openiter = cata
-  uniter f = Place
+  uniter f = place
 
 instance (Iterable a m1 n1, Iterable a m2 n2) =>
          Iterable a (m1 -> m2) (n1 -> n2) where
