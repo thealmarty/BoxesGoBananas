@@ -66,8 +66,13 @@ instance (Iterable a m1 n1, Iterable a m2 n2) =>
   uniter f x = uniter f . x . openiter f
 
 -- Example expressions
+-- \x.x
 identity :: Exp a
 identity = lam id
+
+-- \x.\y.x
+k :: Exp a
+k = lam (\x -> lam (\y -> x))
 
 -- \x.x (\x.x)
 idAppid :: Exp a
@@ -82,5 +87,6 @@ showAux :: ExpF ([String] -> String) -> ([String] -> String)
 showAux (App x y) vars   = "(" <> x vars <> " " <> y vars <> ")"
 showAux (Lam z) (v:vars) = "(fn " <> v <> ". " <> z (const v) vars <> ")"
 
+-- convert expressions to strings
 show :: (forall a. Exp a) -> String
 show e = iter0 showAux e vars
