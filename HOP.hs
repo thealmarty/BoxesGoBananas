@@ -7,6 +7,12 @@
 {-# LANGUAGE TypeSynonymInstances   #-}
 {-# LANGUAGE UndecidableInstances   #-}
 
+module HOP
+  ( HOP.show
+  , lam
+  , app
+  ) where
+
 import           Expression
 
 -- Extending Fegaras and Sheard's catamorphism
@@ -64,19 +70,6 @@ instance (Iterable a m1 n1, Iterable a m2 n2) =>
          Iterable a (m1 -> m2) (n1 -> n2) where
   openiter f x = openiter f . x . uniter f
   uniter f x = uniter f . x . openiter f
-
--- Example expressions
--- \x.x
-identity :: Exp a
-identity = lam id
-
--- \x.\y.x
-k :: Exp a
-k = lam (\x -> lam (\y -> x))
-
--- \x.x (\x.x)
-idAppid :: Exp a
-idAppid = app identity identity
 
 vars :: [String]
 vars =
