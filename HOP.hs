@@ -11,6 +11,7 @@ module HOP
   ( HOP.show
   , lam
   , app
+  , iter0
   ) where
 
 import           Expression
