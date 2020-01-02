@@ -1,4 +1,4 @@
-module ExpressionsEg where
+module EgExpressions where
 
 import           Expression
 import           HOP
